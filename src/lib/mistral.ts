@@ -135,8 +135,11 @@ Rules:
 - Use ATR to determine realistic TP and SL
 - SL should be below support (for LONG) or above resistance (for SHORT)
 - TP should be near next resistance/support level
-- Risk/Reward ratio must be at least 1:1.5
-- Avoid weak setups (return HOLD if unclear)
+- CRITICAL: Risk/Reward ratio MUST be at least 1:2 (risk 1, reward 2)
+- For LONG: (take_profit - entry) / (entry - stop_loss) >= 2
+- For SHORT: (entry - take_profit) / (stop_loss - entry) >= 2
+- If setup cannot achieve 1:2 R:R, return HOLD
+- Be conservative and precise
 
 Return JSON:
 {
@@ -154,7 +157,7 @@ Return JSON:
   "summary": "short explanation"
 }
 
-Be precise, realistic, and conservative.`;
+  Be precise, realistic, and conservative.`;
 
   const response = await fetch(MISTRAL_API_URL, {
     method: 'POST',
@@ -171,5 +174,37 @@ Be precise, realistic, and conservative.`;
 
   if (!response.ok) throw new Error(`Mistral API error: ${response.statusText}`);
   const result = await response.json();
-  return JSON.parse(result.choices[0].message.content);
+  const parsed = JSON.parse(result.choices[0].message.content);
+
+  // Validate and recalculate risk/reward ratio
+  if (parsed.signal !== 'HOLD' && parsed.entry && parsed.take_profit && parsed.stop_loss) {
+    let riskReward: number;
+
+    if (parsed.signal === 'LONG') {
+      const risk = Math.abs(parsed.entry - parsed.stop_loss);
+      const reward = Math.abs(parsed.take_profit - parsed.entry);
+      riskReward = risk > 0 ? reward / risk : 0;
+    } else if (parsed.signal === 'SHORT') {
+      const risk = Math.abs(parsed.stop_loss - parsed.entry);
+      const reward = Math.abs(parsed.entry - parsed.take_profit);
+      riskReward = risk > 0 ? reward / risk : 0;
+    } else {
+      riskReward = 0;
+    }
+
+    // Enforce minimum 1:2 risk/reward ratio
+    if (riskReward < 2) {
+      parsed.signal = 'HOLD';
+      parsed.risk_reward_ratio = 0;
+      parsed.reasoning = {
+        technical: parsed.reasoning?.technical || '',
+        momentum: parsed.reasoning?.momentum || '',
+        risk_management: `Risk/Reward ratio of ${riskReward.toFixed(2)} does not meet minimum 1:2 requirement. Signal changed to HOLD.`
+      };
+    } else {
+      parsed.risk_reward_ratio = Math.round(riskReward * 100) / 100;
+    }
+  }
+
+  return parsed;
 }
