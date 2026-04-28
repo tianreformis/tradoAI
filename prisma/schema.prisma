@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Recommendation {
+  id             String   @id @default(uuid())
+  ticker         String
+  recommendation String
+  confidence     Int
+  technical      String
+  fundamental    String
+  sentiment      String
+  summary        String
+  createdAt      DateTime @default(now())
+
+  @@index([ticker, createdAt])
+  @@map("recommendations")
+}
+
+model DailySignal {
+  id           String   @id @default(uuid())
+  ticker       String
+  signal       String   // LONG / SHORT / HOLD
+  entry        Float?
+  takeProfit   Float?
+  stopLoss     Float?
+  riskReward   Float?
+  confidence   Int
+  technical    String
+  momentum     String
+  risk         String
+  summary      String
+  createdAt    DateTime @default(now())
+
+  @@index([ticker, createdAt])
+  @@map("daily_signals")
+}
