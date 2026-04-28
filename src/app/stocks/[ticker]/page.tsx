@@ -10,10 +10,45 @@ import { Button } from '@/components/ui/button';
 
 interface StockData {
   ticker: string;
-  quote: { regularMarketPrice: number; regularMarketChange: number; regularMarketChangePercent: number; shortName?: string };
+  quote: {
+    regularMarketPrice: number;
+    regularMarketChange: number;
+    regularMarketChangePercent: number;
+    shortName?: string;
+    marketState?: string;
+    preMarketPrice?: number;
+    preMarketChange?: number;
+    preMarketChangePercent?: number;
+    postMarketPrice?: number;
+    postMarketChange?: number;
+    postMarketChangePercent?: number;
+  };
   summary: { price?: { marketCap?: number }; defaultKeyStatistics?: { trailingPE?: number }; financialData?: { epsCurrentYear?: number; revenueGrowth?: number } };
-  history: { date: string; close: number }[];
+  history: { date: string; close: number; open?: number; high?: number; low?: number; volume?: number }[];
   indicators: { rsi: number | null; ema20: number | null; ema50: number | null; ema200: number | null; macd: { macd: number; signal: number; histogram: number } | null; atr?: number | null };
+}
+
+function isMarketOpen(): boolean {
+  const now = new Date();
+  // Convert to ET (UTC-4 or UTC-5 depending on DST)
+  const etTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  const day = etTime.getDay();
+  const hour = etTime.getHours();
+  const minute = etTime.getMinutes();
+  const time = hour * 100 + minute;
+
+  // Market open: Monday-Friday, 9:30 AM - 4:00 PM ET
+  if (day === 0 || day === 6) return false;
+  return time >= 930 && time < 1600;
+}
+
+function getPreviousCloseChange(history: { close: number }[]): { change: number; changePercent: number } | null {
+  if (history.length < 2) return null;
+  const current = history[history.length - 1].close;
+  const previous = history[history.length - 2].close;
+  const change = current - previous;
+  const changePercent = (change / previous) * 100;
+  return { change, changePercent };
 }
 
 interface SignalData {
@@ -104,16 +139,46 @@ export default function StockDetailPage() {
   const eps = summary.financialData?.epsCurrentYear;
   const rg = summary.financialData?.revenueGrowth;
 
+  const marketOpen = isMarketOpen();
+  const prevChange = getPreviousCloseChange(history);
+
+  // Determine what price/change to show
+  let displayPrice = quote.regularMarketPrice;
+  let displayChange = quote.regularMarketChange;
+  let displayChangePercent = quote.regularMarketChangePercent;
+  let changeLabel = marketOpen ? 'Live' : 'Prev Close';
+
+  // Show pre/post market if available and market is closed
+  if (!marketOpen && quote.preMarketPrice && quote.preMarketChange !== undefined) {
+    displayPrice = quote.preMarketPrice;
+    displayChange = quote.preMarketChange;
+    displayChangePercent = quote.preMarketChangePercent || 0;
+    changeLabel = 'Pre-Market';
+  } else if (!marketOpen && quote.postMarketPrice && quote.postMarketChange !== undefined) {
+    displayPrice = quote.postMarketPrice;
+    displayChange = quote.postMarketChange;
+    displayChangePercent = quote.postMarketChangePercent || 0;
+    changeLabel = 'After Hours';
+  } else if (!marketOpen && prevChange) {
+    displayChange = prevChange.change;
+    displayChangePercent = prevChange.changePercent;
+  }
+
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="mb-6">
         <h1 className="text-4xl font-bold font-mono">{ticker}</h1>
         <p className="text-muted-foreground">{quote.shortName}</p>
         <div className="flex items-center gap-4 mt-2">
-          <span className="text-3xl font-bold">${quote.regularMarketPrice?.toFixed(2)}</span>
-          <span className={quote.regularMarketChange >= 0 ? 'text-green-500' : 'text-red-500'}>
-            {quote.regularMarketChange?.toFixed(2)} ({quote.regularMarketChangePercent?.toFixed(2)}%)
-          </span>
+          <span className="text-3xl font-bold">${displayPrice?.toFixed(2)}</span>
+          <div className="flex items-center gap-2">
+            <span className={displayChange >= 0 ? 'text-green-500' : 'text-red-500'}>
+              {displayChange?.toFixed(2)} ({displayChangePercent?.toFixed(2)}%)
+            </span>
+            <Badge variant={marketOpen ? 'default' : 'secondary'} className="text-xs">
+              {changeLabel}
+            </Badge>
+          </div>
         </div>
       </div>
 

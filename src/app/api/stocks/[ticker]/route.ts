@@ -52,7 +52,16 @@ export async function GET(
       ticker,
       quote: {
         regularMarketPrice: quoteData?.regularMarketPrice || 0,
+        regularMarketChange: quoteData?.regularMarketChange || 0,
+        regularMarketChangePercent: quoteData?.regularMarketChangePercent || 0,
         shortName: quoteData?.shortName || summaryData?.price?.shortName || ticker,
+        marketState: quoteData?.marketState || 'REGULAR',
+        preMarketPrice: quoteData?.preMarketPrice,
+        preMarketChange: quoteData?.preMarketChange,
+        preMarketChangePercent: quoteData?.preMarketChangePercent,
+        postMarketPrice: quoteData?.postMarketPrice,
+        postMarketChange: quoteData?.postMarketChange,
+        postMarketChangePercent: quoteData?.postMarketChangePercent,
         trailingPE: pe,
       },
       summary: {
@@ -70,9 +79,10 @@ export async function GET(
       history: historyData.slice(-252).map((h: any) => ({
         date: h.date,
         close: h.close,
-        volume: h.volume,
+        open: h.open,
         high: h.high,
         low: h.low,
+        volume: h.volume,
       })),
       indicators,
     });
