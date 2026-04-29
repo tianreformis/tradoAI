@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 
 interface Signal {
@@ -22,6 +23,8 @@ interface Signal {
 
 export default function TopSignalsPage() {
   const [signals, setSignals] = useState<Signal[]>([]);
+  const [filteredSignals, setFilteredSignals] = useState<Signal[]>([]);
+  const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState(
@@ -60,6 +63,18 @@ export default function TopSignalsPage() {
     fetchSignals();
   }, []);
 
+  useEffect(() => {
+    if (!search.trim()) {
+      setFilteredSignals(signals);
+      return;
+    }
+    const query = search.toLowerCase();
+    const filtered = signals.filter(s =>
+      s.ticker.toLowerCase().includes(query)
+    );
+    setFilteredSignals(filtered);
+  }, [search, signals]);
+
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newDate = e.target.value;
     setSelectedDate(newDate);
@@ -94,6 +109,13 @@ export default function TopSignalsPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">🔥 Top Signals</h1>
         <div className="flex gap-2">
+          <Input
+            type="text"
+            placeholder="Search ticker..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-48"
+          />
           <Button onClick={() => fetchSignals()} disabled={loading}>
             {loading ? 'Refreshing...' : 'Refresh'}
           </Button>
@@ -142,10 +164,10 @@ export default function TopSignalsPage() {
       ) : (
         <>
           <div className="mb-4 text-sm text-muted-foreground">
-            Showing {signals.length} signals for {selectedDate}
+            Showing {filteredSignals.length} signals for {selectedDate}
           </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {signals.map((signal) => (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {filteredSignals.map((signal) => (
               <Link key={signal.id} href={`/stocks/${signal.ticker}`}>
                 <Card className="hover:shadow-lg transition-shadow cursor-pointer">
                   <CardHeader>

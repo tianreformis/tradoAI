@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 
 interface Stock {
@@ -78,6 +79,8 @@ function StockTable({ stocks }: { stocks: Stock[] }) {
 
 export default function ScreenerPage() {
   const [stocks, setStocks] = useState<Stock[]>([]);
+  const [filteredStocks, setFilteredStocks] = useState<Stock[]>([]);
+  const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [warmingUp, setWarmingUp] = useState(false);
 
@@ -123,6 +126,19 @@ export default function ScreenerPage() {
     fetchStocks();
   }, []);
 
+  useEffect(() => {
+    if (!search.trim()) {
+      setFilteredStocks(stocks);
+      return;
+    }
+    const query = search.toLowerCase();
+    const filtered = stocks.filter(s =>
+      s.ticker.toLowerCase().includes(query) ||
+      s.name.toLowerCase().includes(query)
+    );
+    setFilteredStocks(filtered);
+  }, [search, stocks]);
+
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="mb-8">
@@ -135,8 +151,15 @@ export default function ScreenerPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>All Stocks ({stocks.length})</CardTitle>
+            <CardTitle>All Stocks ({filteredStocks.length})</CardTitle>
             <div className="flex gap-2">
+              <Input
+                type="text"
+                placeholder="Search by ticker or name..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-64"
+              />
               {stocks.length === 0 && !loading && (
                 <Button onClick={warmCache} disabled={warmingUp}>
                   {warmingUp ? 'Warming up...' : 'Warm Cache'}
@@ -157,7 +180,7 @@ export default function ScreenerPage() {
               </p>
             </div>
           ) : (
-            <StockTable stocks={stocks} />
+            <StockTable stocks={filteredStocks} />
           )}
         </CardContent>
       </Card>

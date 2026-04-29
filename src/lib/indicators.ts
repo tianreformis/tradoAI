@@ -47,7 +47,15 @@ function calculateMACD(prices: number[]): { macd: number; signal: number; histog
   const ema26 = calculateEMA(prices, 26);
   if (ema12 === null || ema26 === null) return null;
   const macdLine = ema12 - ema26;
-  const signalLine = macdLine * 0.3 + macdLine * 0.7 * 0.3;
+  // Calculate signal line as EMA of MACD line
+  const macdValues = [];
+  for (let i = 25; i < prices.length; i++) {
+    const e12 = calculateEMA(prices.slice(0, i + 1), 12);
+    const e26 = calculateEMA(prices.slice(0, i + 1), 26);
+    if (e12 !== null && e26 !== null) macdValues.push(e12 - e26);
+  }
+  const signalLine = calculateEMA(macdValues, 9);
+  if (signalLine === null) return null;
   return {
     macd: macdLine,
     signal: signalLine,

@@ -109,55 +109,68 @@ export async function getDailySignal(data: {
   const apiKey = process.env.MISTRAL_API_KEY;
   if (!apiKey) throw new Error('MISTRAL_API_KEY not set');
 
-  const prompt = `You are a professional quantitative trader.
+  const trend = data.ema20 && data.ema50 && data.ema200
+    ? (data.ema20 > data.ema50 && data.ema50 > data.ema200
+        ? 'BULLISH (EMA20 > EMA50 > EMA200)'
+        : data.ema20 < data.ema50 && data.ema50 < data.ema200
+        ? 'BEARISH (EMA20 < EMA50 < EMA200)'
+        : 'NEUTRAL (mixed EMAs)')
+    : 'N/A';
 
-Analyze this stock and generate a trade setup.
+  const prompt = `You are a professional quantitative trader with 15+ years of experience.
+
+Analyze this stock and generate a HIGH-PROBABILITY trade setup.
 
 Ticker: ${data.ticker}
 Current Price: ${data.price}
 
 Technical Indicators:
-- RSI: ${data.rsi ?? 'N/A'}
+- RSI(14): ${data.rsi ?? 'N/A'} ${data.rsi ? (data.rsi > 70 ? '(OVERBOUGHT)' : data.rsi < 30 ? '(OVERSOLD)' : '') : ''}
 - EMA20: ${data.ema20 ?? 'N/A'}
 - EMA50: ${data.ema50 ?? 'N/A'}
 - EMA200: ${data.ema200 ?? 'N/A'}
-- MACD: ${data.macd ? JSON.stringify(data.macd) : 'N/A'}
-- ATR: ${data.atr ?? 'N/A'}
+- MACD: ${data.macd ? `Line=${data.macd.macd.toFixed(2)}, Signal=${data.macd.signal.toFixed(2)}, Hist=${data.macd.histogram.toFixed(2)}` : 'N/A'}
+- ATR(14): ${data.atr ?? 'N/A'}
 
-Support/Resistance:
+Support/Resistance Levels:
 - Support: ${data.support ?? 'N/A'}
 - Resistance: ${data.resistance ?? 'N/A'}
 
-Volume:
+Trend Analysis:
+${trend}
+
+Volume Analysis:
 ${data.volume_analysis}
 
-Rules:
-- Use ATR to determine realistic TP and SL
-- SL should be below support (for LONG) or above resistance (for SHORT)
-- TP should be near next resistance/support level
-- CRITICAL: Risk/Reward ratio MUST be at least 1:2 (risk 1, reward 2)
-- For LONG: (take_profit - entry) / (entry - stop_loss) >= 2
-- For SHORT: (entry - take_profit) / (stop_loss - entry) >= 2
-- If setup cannot achieve 1:2 R:R, return HOLD
-- Be conservative and precise
+STRICT RULES:
+1. Entry price MUST be within 0.5% of current price (${data.price})
+2. For LONG: SL must be below support OR entry - (1.5 * ATR), whichever is LOWER
+3. For SHORT: SL must be above resistance OR entry + (1.5 * ATR), whichever is HIGHER
+4. TP must be at nearest resistance (LONG) or support (SHORT) but NO CLOSER than 2x the SL distance
+5. CRITICAL: Risk/Reward ratio MUST be >= 2.0 (enforce strictly)
+6. If trend is BULLISH, only take LONG; if BEARISH, only take SHORT; if NEUTRAL, either but with higher confidence
+7. RSI must confirm: LONG when RSI < 50 or recovering from oversold; SHORT when RSI > 50 or declining from overbought
+8. MACD must confirm: LONG when MACD > Signal; SHORT when MACD < Signal
+9. If any confirmation fails, return HOLD with reasoning
+10. Be extremely conservative - only generate signal if setup is A+ quality
 
-Return JSON:
+Return VALID JSON only:
 {
-  "signal": "LONG | SHORT | HOLD",
-  "entry": number,
+  "signal": "LONG" | "SHORT" | "HOLD",
+  "entry": number (must be close to ${data.price}),
   "take_profit": number,
   "stop_loss": number,
-  "risk_reward_ratio": number,
-  "confidence": number,
+  "risk_reward_ratio": number (must be >= 2.0),
+  "confidence": number (0-100, be strict),
   "reasoning": {
-    "technical": "...",
-    "momentum": "...",
-    "risk_management": "..."
+    "technical": "explain EMA trend, RSI, MACD confirmation",
+    "momentum": "volume analysis and price action",
+    "risk_management": "why SL/TP levels were chosen, R:R calc"
   },
-  "summary": "short explanation"
+  "summary": "one-line explanation of the trade"
 }
 
-  Be precise, realistic, and conservative.`;
+Remember: Only generate HIGH CONFIDENCE setups. When in doubt, HOLD.`;
 
   const response = await fetch(MISTRAL_API_URL, {
     method: 'POST',
