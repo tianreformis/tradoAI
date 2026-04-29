@@ -20,7 +20,7 @@ export async function getQuote(ticker: string) {
   const key = `quote:${ticker}`;
   const cached = getCached(key);
   if (cached) return cached;
-  const data = await yahooFinance.quote(ticker);
+  const data = await yahooFinance.quote(ticker, { validateResult: false } as any);
   setCache(key, data);
   return data;
 }
@@ -31,6 +31,7 @@ export async function getQuoteSummary(ticker: string) {
   if (cached) return cached;
   const data = await yahooFinance.quoteSummary(ticker, {
     modules: ['price', 'summaryDetail', 'financialData', 'defaultKeyStatistics'],
+    validateResult: false,
   } as any);
   setCache(key, data);
   return data;
@@ -40,7 +41,7 @@ export async function getHistorical(ticker: string, period1: string, period2: st
   const key = `hist:${ticker}:${period1}:${period2}`;
   const cached = getCached(key);
   if (cached) return cached;
-  const data = await yahooFinance.historical(ticker, { period1, period2, interval: '1d' });
+  const data = await yahooFinance.historical(ticker, { period1, period2, interval: '1d', validateResult: false } as any);
   setCache(key, data);
   return data;
 }
@@ -49,7 +50,7 @@ export async function searchNews(query: string) {
   const key = `news:${query}`;
   const cached = getCached(key);
   if (cached) return cached;
-  const data = await yahooFinance.search(query, { newsCount: 5 } as any);
+  const data = await yahooFinance.search(query, { newsCount: 5, validateResult: false } as any);
   setCache(key, data);
   return data;
 }

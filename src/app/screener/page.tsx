@@ -66,7 +66,7 @@ function StockTable({ stocks }: { stocks: Stock[] }) {
               <td className="p-2 text-center">
                 {stock.volumeSpike && <Badge variant="destructive" className="text-xs">Spike</Badge>}
                 {stock.volumeTrend === 'increasing' && <Badge variant="default" className="text-xs ml-1">↑</Badge>}
-                {stock.volumeTrend === 'decreasing' && <Badge variant="secondary" className="text-xs ml-1">↓</Badge>}
+                {stock.volumeTrend === 'decreasing' && <Badge variant="outline" className="text-xs ml-1">↓</Badge>}
               </td>
             </tr>
           ))}
