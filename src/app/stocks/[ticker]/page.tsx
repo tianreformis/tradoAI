@@ -7,6 +7,7 @@ import { SignalCard } from '@/components/SignalCard';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useWatchlist } from '@/hooks/use-watchlist';
 
 interface StockData {
   ticker: string;
@@ -74,6 +75,8 @@ export default function StockDetailPage() {
   const [loading, setLoading] = useState(true);
   const [signalLoading, setSignalLoading] = useState(false);
   const [signalChecked, setSignalChecked] = useState(false);
+  const { addToWatchlist, removeFromWatchlist, isInWatchlist } = useWatchlist();
+  const inWatchlist = isInWatchlist(ticker);
 
   useEffect(() => {
     fetchData();
@@ -171,14 +174,23 @@ export default function StockDetailPage() {
         <p className="text-muted-foreground">{quote.shortName}</p>
         <div className="flex items-center gap-4 mt-2">
           <span className="text-3xl font-bold">${displayPrice?.toFixed(2)}</span>
-          <div className="flex items-center gap-2">
-            <span className={displayChange >= 0 ? 'text-green-500' : 'text-red-500'}>
-              {displayChange?.toFixed(2)} ({displayChangePercent?.toFixed(2)}%)
-            </span>
-            <Badge variant={marketOpen ? 'default' : 'secondary'} className="text-xs">
-              {changeLabel}
-            </Badge>
-          </div>
+              <div className="flex items-center gap-2">
+                {marketOpen ? (
+                  <Badge variant="default" className="text-xs">Market Open</Badge>
+                ) : (
+                  <Badge variant="secondary" className="text-xs">Market Closed</Badge>
+                )}
+                <span className="text-sm text-muted-foreground">
+                  {marketOpen ? 'Live data' : 'Pre-market/After-hours'}
+                </span>
+                <Button
+                  variant={inWatchlist ? "destructive" : "outline"}
+                  size="sm"
+                  onClick={() => inWatchlist ? removeFromWatchlist(ticker) : addToWatchlist(ticker)}
+                >
+                  {inWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
+                </Button>
+              </div>
         </div>
       </div>
 

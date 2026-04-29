@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { useWatchlist } from '@/hooks/use-watchlist';
 
 const POPULAR_TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'BRK.B'];
 
@@ -17,6 +18,8 @@ interface HomeSignal {
 export default function Home() {
   const [signals, setSignals] = useState<Record<string, HomeSignal>>({});
   const [loading, setLoading] = useState(true);
+  const { watchlist, isInWatchlist } = useWatchlist();
+  const displayTickers = watchlist.length > 0 ? watchlist : POPULAR_TICKERS;
 
   useEffect(() => {
     fetchSignals();
@@ -62,9 +65,11 @@ export default function Home() {
       </div>
 
       <div className="max-w-3xl mx-auto">
-        <h2 className="text-2xl font-bold mb-4">Popular Stocks</h2>
+        <h2 className="text-2xl font-bold mb-4">
+          {watchlist.length > 0 ? 'Your Watchlist' : 'Popular Stocks'}
+        </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {POPULAR_TICKERS.map(ticker => {
+          {displayTickers.map(ticker => {
             const signal = signals[ticker];
             return (
               <Link key={ticker} href={`/stocks/${ticker}`}>
@@ -100,11 +105,19 @@ export default function Home() {
         </div>
       </div>
 
+      {watchlist.length === 0 && (
+        <div className="max-w-3xl mx-auto mt-8">
+          <div className="text-center">
+            <Link href="/signals">
+              <Button variant="outline" size="lg">View All Daily Signals 🔥</Button>
+            </Link>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-3xl mx-auto mt-8">
-        <div className="text-center">
-          <Link href="/signals">
-            <Button variant="outline" size="lg">View All Daily Signals 🔥</Button>
-          </Link>
+        <div className="text-center text-sm text-muted-foreground">
+          <p>💡 Tip: Visit any stock page and add it to your watchlist for quick access</p>
         </div>
       </div>
     </main>
