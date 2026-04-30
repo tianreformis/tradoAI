@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { ScadcnButton } from '@/ui/scadcn';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { useWatchlist } from '@/hooks/use-watchlist';
@@ -60,7 +60,7 @@ export default function Home() {
           AI-powered stock analysis with technical indicators and real-time data
         </p>
         <Link href="/screener">
-          <Button size="lg">Start Screening</Button>
+          <ScadcnButton size="lg">Start Screening</ScadcnButton>
         </Link>
       </div>
 
@@ -109,7 +109,7 @@ export default function Home() {
         <div className="max-w-3xl mx-auto mt-8">
           <div className="text-center">
             <Link href="/signals">
-              <Button variant="outline" size="lg">View All Daily Signals 🔥</Button>
+              <ScadcnButton variant="outline" size="lg">View All Daily Signals 🔥</ScadcnButton>
             </Link>
           </div>
         </div>

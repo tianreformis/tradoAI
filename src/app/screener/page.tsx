@@ -1,10 +1,9 @@
-'use client';
+ 'use client';
 
 import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { ScadcnButton, ScadcnInput } from '@/ui/scadcn';
 import Link from 'next/link';
 
 interface Stock {
@@ -152,21 +151,21 @@ export default function ScreenerPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>All Stocks ({filteredStocks.length})</CardTitle>
-            <div className="flex gap-2">
-              <Input
-                type="text"
-                placeholder="Search by ticker or name..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-64"
-              />
-              {stocks.length === 0 && !loading && (
-                <Button onClick={warmCache} disabled={warmingUp}>
-                  {warmingUp ? 'Warming up...' : 'Warm Cache'}
-                </Button>
-              )}
-              <Button onClick={() => { setLoading(true); fetchStocks(); }}>Refresh</Button>
-            </div>
+              <div className="flex gap-2">
+                <ScadcnInput
+                  type="text"
+                  placeholder="Search by ticker or name..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-64"
+                />
+               {stocks.length === 0 && !loading && (
+                 <ScadcnButton onClick={warmCache} disabled={warmingUp}>
+                   {warmingUp ? 'Warming up...' : 'Warm Cache'}
+                 </ScadcnButton>
+               )}
+               <ScadcnButton onClick={() => { setLoading(true); fetchStocks(); }}>Refresh</ScadcnButton>
+              </div>
           </div>
         </CardHeader>
         <CardContent>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Button } from '@/components/ui/button';
+import { ScadcnButton } from '@/ui/scadcn';
 
 interface DataPoint {
   date: string;
@@ -37,9 +37,9 @@ export function StockChart({ data }: { data: DataPoint[] }) {
     <div>
       <div className="flex gap-2 mb-4">
         {periods.map(p => (
-          <Button key={p.label} variant={period === p.label ? 'default' : 'outline'} size="sm" onClick={() => setPeriod(p.label)}>
+          <ScadcnButton key={p.label} variant={period === p.label ? 'default' : 'outline'} size="sm" onClick={() => setPeriod(p.label)}>
             {p.label}
-          </Button>
+          </ScadcnButton>
         ))}
       </div>
       <ResponsiveContainer width="100%" height={400}>

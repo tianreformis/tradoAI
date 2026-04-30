@@ -1,10 +1,9 @@
-'use client';
+ 'use client';
 
 import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { ScadcnButton, ScadcnInput } from '@/ui/scadcn';
 import Link from 'next/link';
 
 interface Signal {
@@ -109,19 +108,19 @@ export default function TopSignalsPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">🔥 Top Signals</h1>
         <div className="flex gap-2">
-          <Input
+          <ScadcnInput
             type="text"
             placeholder="Search ticker..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-48"
           />
-          <Button onClick={() => fetchSignals()} disabled={loading}>
+          <ScadcnButton onClick={() => fetchSignals()} disabled={loading}>
             {loading ? 'Refreshing...' : 'Refresh'}
-          </Button>
-          <Button onClick={generateAllSignals} variant="outline">
+          </ScadcnButton>
+          <ScadcnButton onClick={generateAllSignals} variant="outline">
             Generate All (500)
-          </Button>
+          </ScadcnButton>
         </div>
       </div>
 

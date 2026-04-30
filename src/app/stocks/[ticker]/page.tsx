@@ -6,7 +6,7 @@ import { StockChart } from '@/components/StockChart';
 import { SignalCard } from '@/components/SignalCard';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { ScadcnButton } from '@/ui/scadcn';
 import { useWatchlist } from '@/hooks/use-watchlist';
 
 interface StockData {
@@ -183,13 +183,13 @@ export default function StockDetailPage() {
                 <span className="text-sm text-muted-foreground">
                   {marketOpen ? 'Live data' : 'Pre-market/After-hours'}
                 </span>
-                <Button
+                <ScadcnButton
                   variant={inWatchlist ? "destructive" : "outline"}
                   size="sm"
                   onClick={() => inWatchlist ? removeFromWatchlist(ticker) : addToWatchlist(ticker)}
                 >
                   {inWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
-                </Button>
+                </ScadcnButton>
               </div>
         </div>
       </div>
@@ -244,9 +244,9 @@ export default function StockDetailPage() {
             />
             {!signal && signalChecked && (
               <div className="mt-4 text-center">
-                <Button onClick={getSignal} disabled={signalLoading}>
+                <ScadcnButton onClick={getSignal} disabled={signalLoading}>
                   {signalLoading ? 'Generating...' : 'Generate Daily Signal'}
-                </Button>
+                </ScadcnButton>
               </div>
             )}
           </CardContent>
