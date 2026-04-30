@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { Fire, Home, Search, Layout } from 'lucide-react';
 import './globals.css';
 import ScadcnShell from '../components/ui/ScadcnShell';
 
@@ -11,7 +12,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'US Stock Market Screener',
-  description: 'AI-powered US stock screening and analysis tool with daily trade signals',
+  description: 'US stock screener with daily signals and insights',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

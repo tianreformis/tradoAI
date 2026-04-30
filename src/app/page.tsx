@@ -57,7 +57,7 @@ export default function Home() {
       <div className="text-center mb-16">
         <h1 className="text-5xl font-bold tracking-tight mb-4">US Stock Market Screener</h1>
         <p className="text-xl text-muted-foreground mb-8">
-          AI-powered stock analysis with technical indicators and real-time data
+          Stock analysis with technical indicators and real-time data
         </p>
         <Link href="/screener">
           <ScadcnButton size="lg">Start Screening</ScadcnButton>

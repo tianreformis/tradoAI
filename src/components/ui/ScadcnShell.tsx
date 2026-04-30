@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import { Fire, Layout, Search, Home } from 'lucide-react';
 
 type Props = { children: React.ReactNode };
 
@@ -28,9 +29,9 @@ const ScadcnShell: React.FC<Props> = ({ children }) => {
               StockScreener
             </a>
           </div>
-          <nav className="scadcn-shell-nav" aria-label="Top navigation">
-            <a href="/screener" className="scadcn-shell-nav-link">Screener</a>
-            <a href="/signals" className="scadcn-shell-nav-link">🔥 Signals</a>
+        <nav className="scadcn-shell-nav" aria-label="Top navigation">
+            <a href="/screener" className="scadcn-shell-nav-link"><Layout size={16} /> Screener</a>
+            <a href="/signals" className="scadcn-shell-nav-link"><Fire size={16} /> Signals</a>
           </nav>
         </div>
       </header>
@@ -53,9 +54,9 @@ const ScadcnShell: React.FC<Props> = ({ children }) => {
       />
 
       <nav className="scadcn-shell-bottomnav" aria-label="Mobile bottom navigation">
-        <a href="/screener" className="scadcn-shell-bottomnav-item">🔎</a>
-        <a href="/signals" className="scadcn-shell-bottomnav-item">🔥</a>
-        <a href="/" className="scadcn-shell-bottomnav-item">🏠</a>
+        <a href="/screener" className="scadcn-shell-bottomnav-item" aria-label="Screener"><Search size={18} /></a>
+        <a href="/signals" className="scadcn-shell-bottomnav-item" aria-label="Signals"><Fire size={18} /></a>
+        <a href="/" className="scadcn-shell-bottomnav-item" aria-label="Home"><Home size={18} /></a>
       </nav>
 
       <main className="scadcn-shell-content container">{children}</main>

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScadcnButton, ScadcnInput } from '@/ui/scadcn';
+import { Fire } from 'lucide-react';
 import Link from 'next/link';
 
 interface Signal {
@@ -106,7 +107,9 @@ export default function TopSignalsPage() {
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">🔥 Top Signals</h1>
+        <h1 className="text-3xl font-bold flex items-center gap-2">
+          <Fire size={20} /> Top Signals
+        </h1>
         <div className="flex gap-2">
           <ScadcnInput
             type="text"
