@@ -22,11 +22,12 @@
         "name": "next"
       }
     ],
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    }
+  "paths": {
+    "@/*": [
+      "./src/*"
+    ],
+    "scadcnui": ["./src/scadcnui/index"]
+  }
   },
   "include": [
     "next-env.d.ts",

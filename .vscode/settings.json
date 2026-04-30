@@ -1,4 +1,10 @@
 {
-    "audioCues.lineHasError": "off"
+    "accessibility.signals.lineHasError": {
+        "sound": "off"
+    },
+    
+    "editor.fontSize": 18,
+    "terminal.integrated.fontSize": 16,
+    "github.copilot.renameSuggestions.triggerAutomatically": true
 
 }
